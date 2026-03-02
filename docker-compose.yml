@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  mcp-server:
+    build:
+      context: ./mcp-server
+    container_name: fda-mcp-server
+    env_file:
+      - .env
+    environment:
+      # OPENFDA_API_KEY is expected in .env at repo root
+      - OPENFDA_API_KEY=${OPENFDA_API_KEY}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: ./agent
+    container_name: fda-agent
+    env_file:
+      - .env
+    environment:
+      # Anthropic API key from root .env
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Internal URL for MCP server inside the Docker network
+      - MCP_SERVER_BASE_URL=http://mcp-server:8000
+    depends_on:
+      - mcp-server
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: fda-frontend
+    depends_on:
+      - agent
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
