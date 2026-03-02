@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt /app/requirements.txt
 
+RUN pip install --no-cache-dir "numpy>=2.0.0"
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
